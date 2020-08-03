@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     private var recordButton: Button? = null
     private var recorder: AudioRecord? = null
+    private var intSize: Int = 0
 
     private var player: MediaPlayer? = null
 
@@ -59,6 +60,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun startRecording() {
 
+        var a = 1
         var bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE, RECORDER_CHANNELS,
             RECORDER_AUDIO_ENCODING)
 //        println(bufferSize)
@@ -81,7 +83,18 @@ class MainActivity : AppCompatActivity() {
                     // Write the byte array to the track
                     println(at.write(sData, 0, sData.size))
                     at.stop()
-                    //at.release()
+                    if(a > 30) {
+                        at.release()
+                        at = AudioTrack(
+                            AudioManager.STREAM_MUSIC,
+                            RECORDER_SAMPLERATE,
+                            AudioFormat.CHANNEL_OUT_MONO,
+                            RECORDER_AUDIO_ENCODING,
+                            intSize,
+                            AudioTrack.MODE_STREAM
+                        )
+                    }
+                    a++
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -132,7 +145,7 @@ class MainActivity : AppCompatActivity() {
 
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION)
 
-        val intSize = AudioTrack.getMinBufferSize(
+        intSize = AudioTrack.getMinBufferSize(
             RECORDER_SAMPLERATE,
             AudioFormat.CHANNEL_OUT_MONO,
             RECORDER_AUDIO_ENCODING
