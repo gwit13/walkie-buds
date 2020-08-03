@@ -4,13 +4,17 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.media.*
+import android.media.AudioFormat.ENCODING_PCM_16BIT
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View.OnClickListener
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import kotlinx.android.synthetic.main.activity_main.*
 import java.io.IOException
 
 
@@ -18,13 +22,13 @@ private const val LOG_TAG = "WalkieBuds"
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
 private const val RECORDER_SAMPLERATE = 44100
 private const val RECORDER_CHANNELS = 16
-private const val RECORDER_AUDIO_ENCODING = 2
+private const val RECORDER_AUDIO_ENCODING = ENCODING_PCM_16BIT
 
 
 class MainActivity : AppCompatActivity() {
     private var fileName: String = ""
 
-    private var recordButton: RecordButton? = null
+    private var recordButton: Button? = null
     private var recorder: AudioRecord? = null
 
     private var player: MediaPlayer? = null
@@ -61,7 +65,7 @@ class MainActivity : AppCompatActivity() {
 //        bufferSize += 2048
         var bytesPerElement = 2
 
-        recorder = AudioRecord(MediaRecorder.AudioSource.MIC, RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING, bufferSize*bytesPerElement)
+        recorder = AudioRecord(MediaRecorder.AudioSource.MIC, RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING, bufferSize)
 
         recorder!!.startRecording()
 
@@ -69,29 +73,15 @@ class MainActivity : AppCompatActivity() {
 
         var recordingThread = Thread(Runnable {
             try {
-                val intSize = AudioTrack.getMinBufferSize(
-                    RECORDER_SAMPLERATE,
-                    AudioFormat.CHANNEL_OUT_MONO,
-                    RECORDER_AUDIO_ENCODING
-                )
-                val sData = ByteArray(RECORDER_SAMPLERATE+128)
-                at = AudioTrack(
-                    AudioManager.STREAM_MUSIC,
-                    RECORDER_SAMPLERATE,
-                    AudioFormat.CHANNEL_OUT_MONO,
-                    RECORDER_AUDIO_ENCODING,
-                    intSize,
-                    AudioTrack.MODE_STREAM
-                )
+                val sData = ByteArray(bufferSize)
+
                 while (isRecording) {
-                    recorder!!.read(sData, 1, bufferSize) //isRecording = false; onStop button
-                    if (at != null) {
-                        at.play()
-                        // Write the byte array to the track
-                        println(at.write(sData, 0, sData.size))
-                        at.stop()
-                        //at.release()
-                    }
+                    recorder!!.read(sData, 0, bufferSize) //isRecording = false; onStop button
+                    at.play()
+                    // Write the byte array to the track
+                    println(at.write(sData, 0, sData.size))
+                    at.stop()
+                    //at.release()
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -103,7 +93,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun stopRecording() {
         isRecording = false
-        at.stop()
+//        at.stop()
         at.release()
 
         recorder?.apply {
@@ -136,18 +126,48 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(icicle: Bundle?) {
         super.onCreate(icicle)
 
+        setContentView(R.layout.activity_main)
+
         fileName = "${externalCacheDir?.absolutePath}/audiorecordtest.3gp"
 
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION)
 
-        recordButton = RecordButton(this)
-        val ll = LinearLayout(this).apply {
-            addView(recordButton, LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    0f))
+        val intSize = AudioTrack.getMinBufferSize(
+            RECORDER_SAMPLERATE,
+            AudioFormat.CHANNEL_OUT_MONO,
+            RECORDER_AUDIO_ENCODING
+        )
+
+        at = AudioTrack(
+            AudioManager.STREAM_MUSIC,
+            RECORDER_SAMPLERATE,
+            AudioFormat.CHANNEL_OUT_MONO,
+            RECORDER_AUDIO_ENCODING,
+            intSize,
+            AudioTrack.MODE_STREAM
+        )
+
+//        recordButton = RecordButton(this)
+
+        recordButton = record
+        var mStartPlaying = true
+        recordButton?.setOnClickListener {
+            onRecord(mStartPlaying)
+
+            recordButton!!.text = when(mStartPlaying) {
+                true -> "Disable Microphone Sharing"
+                false -> "Enable Microphone Sharing"
+            }
+            mStartPlaying = !mStartPlaying
         }
-        setContentView(ll)
+
+//        val ll = LinearLayout(this).apply {
+//            addView(recordButton, LinearLayout.LayoutParams(
+//                    ViewGroup.LayoutParams.WRAP_CONTENT,
+//                    ViewGroup.LayoutParams.WRAP_CONTENT,
+//                    0f))
+//        }
+//        setContentView(ll)
     }
 
     override fun onStop() {

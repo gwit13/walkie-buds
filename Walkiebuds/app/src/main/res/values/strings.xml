@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Walkie-buds</string>
+    <string name="activate_blurb">Enable Microphone Sharing</string>
+    <string name="photo_alt_text">Bluetooth Logo</string>
 </resources>
