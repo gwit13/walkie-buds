@@ -10,7 +10,7 @@
         android:id="@+id/record"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/roboto_slab_bold"
+        android:fontFamily="@font/cabin_bold"
         android:text="@string/activate_blurb"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -21,15 +21,28 @@
         android:id="@+id/imageView"
         android:layout_width="115dp"
         android:layout_height="99dp"
+        android:contentDescription="@string/photo_alt_text"
         android:scaleType="centerInside"
-        android:scaleX="5"
-        android:scaleY="5"
+        android:scaleX="1"
+        android:scaleY="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.346"
-        app:srcCompat="@drawable/ic_baseline_bluetooth_24"
-        android:contentDescription="@string/photo_alt_text" />
+        app:srcCompat="@drawable/ic_baseline_bluetooth_120" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/cabin_bold"
+        android:text="@string/header"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
