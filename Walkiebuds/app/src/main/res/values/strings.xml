@@ -3,4 +3,5 @@
     <string name="activate_blurb">Enable Microphone Sharing</string>
     <string name="photo_alt_text">Bluetooth Logo</string>
     <string name="header">Walkie-buds</string>
+    <string name="blurb">Keep one earbud, give one to a friend. Provided you stay within bluetooth range, Walkie-buds will take your audio and stream it to your friend, and vice versa.</string>
 </resources>

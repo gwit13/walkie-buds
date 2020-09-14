@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.media.*
 import android.media.AudioFormat.ENCODING_PCM_16BIT
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.IOException
+import java.lang.Exception
 
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
 private const val RECORDER_SAMPLERATE = 44100
@@ -61,8 +63,24 @@ class MainActivity : AppCompatActivity() {
         var a = 0 //used for refreshing the AudioTrack object every 32 calls
 
         var bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING) //finding the minimum allowable buffer with current values (at the top)
-
-        recorder = AudioRecord(MediaRecorder.AudioSource.MIC, RECORDER_SAMPLERATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING, bufferSize) //mic input
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                recorder = AudioRecord(
+                    MediaRecorder.AudioSource.VOICE_PERFORMANCE,
+                    RECORDER_SAMPLERATE,
+                    RECORDER_CHANNELS,
+                    RECORDER_AUDIO_ENCODING,
+                    bufferSize
+                ) //mic input
+            }
+            else{
+                recorder = AudioRecord(
+                    MediaRecorder.AudioSource.MIC,
+                    RECORDER_SAMPLERATE,
+                    RECORDER_CHANNELS,
+                    RECORDER_AUDIO_ENCODING,
+                    bufferSize
+                ) //mic input
+            }
         recorder!!.startRecording() //start listening
 
         //initializes AudioTrack using intSize initialized in onCreate
